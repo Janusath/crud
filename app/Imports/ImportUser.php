@@ -17,15 +17,16 @@ class ImportUser implements ToCollection,WithHeadingRow
     */
     public function collection(Collection $row)
     {
-        foreach($row as $r){
-            User::create([
-                'name'=>$r['name'],
-                'email'=>$r['email'],
-                'password'=>bcrypt(12345678),
-                'profile'=>$r['img'],
-            ]);
-
+        foreach ($row as $r) {
+            // Check if user already exists with the given email
+            if (!User::where('email', $r['email'])->exists()) {
+                User::create([
+                    'name' => $r['name'],
+                    'email' => $r['email'],
+                    'password' => bcrypt('12345678'), // Use a secure password hashing mechanism
+                    'profile' => $r['img'],
+                ]);
+            }
         }
-      
     }
 }

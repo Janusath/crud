@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Exports\ExportUser;
 use App\Imports\ImportUser;
-use Excel;
+use Maatwebsite\Excel\Facades\Excel;
+
 class UserController extends Controller
 {
    public function index()
@@ -17,7 +18,7 @@ class UserController extends Controller
 
    public function create()
    {
-    
+
     return view('create');
    }
 
@@ -27,11 +28,11 @@ class UserController extends Controller
     $this->validate($request,[
         'name'=>'required|string|min:3',
         'email'=>'required|email|unique:users,email',
-        'password'=>'required|string|min:6|max:8',
+        'password'=>'required|string|min:3|max:20',
         'password_confirmation'=>'required|same:password',
         'profile'=>'required|image',
     ]);
-    
+
     $user  = new User;
     $user->name = $request->name;
     $user->email = $request->email;
@@ -48,7 +49,7 @@ class UserController extends Controller
         $image->move($path,$profile);
         $user->profile = $path.'/'.$profile;
     }
-    
+
     if($user->save())
     {
         return redirect("/")->with("success","User Saved Successfully!!");
@@ -64,13 +65,13 @@ class UserController extends Controller
    }
    public function update(Request $request , $id)
    {
-    
+
     $this->validate($request,[
         'name'=>'required|string|min:3',
-        'email'=>'required|email|unique:users,email,'.$request->id,       
+        'email'=>'required|email|unique:users,email,'.$request->id,
         'profile'=>'image',
     ]);
-    
+
     $user = User::findOrFail($id);
     $user->name = $request->name;
     $user->email = $request->email;
@@ -86,7 +87,7 @@ class UserController extends Controller
         $image->move($path,$profile);
         $user->profile = $path.'/'.$profile;
     }
-    
+
     if($user->save())
     {
         return redirect("/")->with("success","User Updated Successfully!!");
@@ -97,7 +98,7 @@ class UserController extends Controller
    public function view($id)
    {
     $user = User::findOrFail($id);
-    return response()->json(['user'=>$user],200);    
+    return response()->json(['user'=>$user],200);
    }
 
    public function delete($id)
@@ -106,9 +107,9 @@ class UserController extends Controller
     $result = $user->delete();
     if($result)
     {
-        return response()->json(['msg'=>'User Deleted Successfully!!'],200); 
+        return response()->json(['msg'=>'User Deleted Successfully!!'],200);
     }
-    return response()->json(['msg'=>'Fail!! to delete user'],200);    
+    return response()->json(['msg'=>'Fail!! to delete user'],200);
    }
 
    public function export()
@@ -121,9 +122,17 @@ class UserController extends Controller
        return view('import');
    }
 
-   public function import(Request $request)
-   {
-     Excel::import(new ImportUser,$request->file('file'));
-    return redirect()->route('index')->withSuccess('Excel Import Successfully!!');
-   }
+//    public function import(Request $request)
+//    {
+//      Excel::import(new ImportUser,$request->file('file'));
+//     return redirect()->route('index')->withSuccess('Excel Import Successfully!!');
+//    }
+public function import(Request $request)
+{
+    $file = $request->file('user_file');
+    // Explicitly specify the file type
+    Excel::import(new ImportUser, $file, \Maatwebsite\Excel\Excel::XLSX);
+    return redirect()->back()->with('success', 'Users imported successfully.');
+}
+
 }

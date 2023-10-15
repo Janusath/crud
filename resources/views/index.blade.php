@@ -28,7 +28,7 @@
                         </div>
                         <div class="col-lg-6 mt-3">
                             <div class="pull-left mb-2">
-                                <h2>Laravel 10 CRUD </h2>
+                                <h2>laravel import export </h2>
                             </div>
                         </div>
                     </div>
@@ -37,8 +37,8 @@
                     <table class="table table-bordered table-striped">
                         <tr>
                             <th>Sr. No.</th>
-                            <th>Profile</th>
                             <th>Username</th>
+                            <th>Profile</th>
                             <th>Email</th>
                             <th>Action</th>
                         </tr>
@@ -103,21 +103,21 @@
         {
             $('#delete_id').attr('value','');
             $('#delete_id').attr('value',id);
-           
+
         }
 
         function deleteUser(){
             var id =  $('#delete_id').val();
-           
+
             $.ajax({
              url:'{{url("/")}}/delete-user/'+id,
              type:"GET",
              data:{id:id},
              success:function(data)
              {
-               
-               alert(data.msg);   
-               location.reload();     
+
+               alert(data.msg);
+               location.reload();
              },
              error:function(data)
              {
